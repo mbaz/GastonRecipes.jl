@@ -1,0 +1,13 @@
+name = "GastonRecipes"
+uuid = "39356fd2-1f9e-4efe-8abf-5745c7d9f608"
+authors = ["Miguel Bazdresch <miguelb@2pif.info>"]
+version = "1.0.0"
+
+[deps]
+MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+MacroTools = "0.5"
+Test = "1"
+julia = "1.10"
