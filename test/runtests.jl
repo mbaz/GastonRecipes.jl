@@ -1,4 +1,4 @@
-using GastonRecipes: @gpkw, PlotRecipe, AxisRecipe, FigureRecipe
+using GastonRecipes: @gpkw, PlotRecipe, AxisRecipe, FigureRecipe, DataBlock
 using Test
 
 @testset "Recipes" begin
@@ -38,4 +38,20 @@ using Test
     @test s[1] == ("grid" => true)
     @test s[2] == ("grid" => false)
     @test s[3] == ("gg" => "test")
+    # DataBlock tests
+    x = ["1 0 0", "1 1 1"]
+    y = ["0 1 0"]
+    z = ["0 0 1", "0 0 0"]
+    db = DataBlock(x, y, z)
+    seek(db.data, 0)
+    @test read(db.data, Char) == '1'
+    x = ("1 0 0", "1 1 1", "0 1 0", "0 0 1", "0 0 0")
+    db = DataBlock(x)
+    seek(db.data, 0)
+    @test read(db.data, Char) == '1'
+    X = [1 0 0; 0 0 1]
+    Y = [1 0 1; 0 1 0]
+    db = DataBlock(X, Y)
+    seek(db.data, 0)
+    @test read(db.data, Char) == '1'
 end

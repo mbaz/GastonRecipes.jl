@@ -106,4 +106,104 @@ macro gpkw(ex)
     esc(postwalk(procopts, ex))
 end
 
+### DataBlock
+
+struct DataBlock
+    data :: IOBuffer
+end
+
+"""
+    DataBlock(vs::Vector{<:AbstractString}...)
+
+Create a DataBlock from a vector of strings. Each vector is interpreted as a
+block (separated by newlines).
+
+### Example
+
+```julia
+julia> x = ["1 0 0", "1 1 1"]
+julia> y = ["0 1 0"]
+julia> z = ["0 0 1", "0 0 0"]
+julia> db = DataBlock(x, y, z)
+julia> print(String(take!(db.data)))
+1 0 0
+1 1 1
+
+0 1 0
+
+0 0 1
+0 0 0
+```
+"""
+function DataBlock(vs::Vector{<:AbstractString}...)
+    iob = IOBuffer()
+    for block in vs
+        for l in block
+            write(iob, l*"\n")
+        end
+        write(iob, "\n")
+    end
+    DataBlock(iob)
+end
+
+"""
+    DataBlock(ts::NTuple{N, AbstractString) where N
+
+Create a DataTable from a tuple of strings.
+
+### Example
+
+```julia
+julia> x = ("1 0 0", "1 1 1", "0 1 0", "0 0 1", "0 0 0")
+julia> db = DataBlock(x)
+julia> print(String(take!(db.data)))
+1 0 0
+1 1 1
+0 1 0
+0 0 1
+0 0 0
+```
+"""
+function DataBlock(ts::NTuple{N, AbstractString}) where N
+    iob = IOBuffer()
+    for l in ts
+        write(iob, l*"\n")
+    end
+    DataBlock(iob)
+end
+
+"""
+    DataBlock(args::Union{AbstractVector{<:Real},
+                          AbstractMatrix{<:Real}}...)
+
+Create a DataTable from vectors or matrices. Each array is a
+datablock, which are separated by newlines.
+
+### Example
+```julia
+julia> X = [1 0 0; 0 0 1]
+julia> Y = [1 0 1; 0 1 0]
+julia> db = DataBlock(X, Y)
+julia> print(String(take!(db.data)))
+1 0 0
+0 0 1
+
+1 0 1
+0 1 0
+```
+"""
+function DataBlock(args::Union{AbstractVector{<:Real},
+                               AbstractMatrix{<:Real}}...)
+    iob = IOBuffer()
+    for m in args
+        m isa AbstractVector && (m = m')  # convert to row vector
+        for r in eachrow(m)
+            write(iob, join(r, " "))
+            write(iob, "\n")
+        end
+        write(iob, "\n")
+    end
+    DataBlock(iob)
+end
+
 end # module GastonRecipes
